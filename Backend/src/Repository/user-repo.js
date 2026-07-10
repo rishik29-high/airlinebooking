@@ -1,18 +1,30 @@
-import {users} from '../Models/users-model.js'
+import { User } from '../Models/users-model.js'
 
-class userRepository{
-    async create(data){
-        try {
-            const user = await users.create(data)
-            return user
-        } catch (error) {
-            console.log("something went wrong in the user-repo layer: ",error)
-            throw error;
-        }
+/**
+ * UserRepository — handles all direct database operations for users.
+ * This is the only layer that talks to MongoDB.
+ */
+class UserRepository {
+
+  /** Create a new user in the database */
+  async create(data) {
+    try {
+      const user = await User.create(data)
+      return user
+    } catch (error) {
+      throw error
     }
+  }
 
+  /** Find a user by their email address */
+  async getByEmail(email) {
+    try {
+      const user = await User.findOne({ email })
+      return user
+    } catch (error) {
+      throw error
+    }
+  }
 }
 
-export{
-    userRepository
-}
+export { UserRepository }

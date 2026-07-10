@@ -1,122 +1,117 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import SignUp from './signUp and SignIn/SignUp'
+import SignIn from './signUp and SignIn/SignIn'
+import Home from './Home'
 
+/**
+ * App — the root component that controls which page the user sees.
+ *
+ * Page routing works like this:
+ *   - 'signup'  → show the registration form
+ *   - 'signin'  → show the login form
+ *   - 'home'    → show the protected dashboard (requires a valid token)
+ *
+ * On startup, we check if the user already has a valid token saved.
+ * If yes, we skip the login screen and go straight to the dashboard.
+ */
 function App() {
-  const [count, setCount] = useState(0)
+  const [page, setPage] = useState('signin')
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+  // On first load, check if the user is already logged in
+  useEffect(() => {
+    const verifyToken = async () => {
+      const token = localStorage.getItem('token')
 
-      <div className="ticks"></div>
+      // No token saved? Go to the sign-in page
+      if (!token) {
+        setLoading(false)
+        return
+      }
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      try {
+        // Try calling the protected /api/home endpoint with the saved token
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        const response = await axios.get('/api/home')
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        if (response.data.success) {
+          setUser(response.data.data.user)
+          setPage('home')
+        } else {
+          clearAuth()
+        }
+      } catch {
+        // Token is invalid or expired — clear it and show login
+        clearAuth()
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    verifyToken()
+  }, [])
+
+  /** Called after a successful sign-in — fetches user data and shows the dashboard */
+  const handleSignInSuccess = async (token) => {
+    try {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      const response = await axios.get('/api/home')
+
+      if (response.data.success) {
+        setUser(response.data.data.user)
+      }
+    } catch {
+      // Even if fetching user data fails, still show the home page
+    }
+    setPage('home')
+  }
+
+  /** Logs the user out — clears token, resets state, and goes to login */
+  const handleLogout = () => {
+    clearAuth()
+  }
+
+  /** Helper to remove the token and reset state */
+  const clearAuth = () => {
+    localStorage.removeItem('token')
+    delete axios.defaults.headers.common['Authorization']
+    setUser(null)
+    setPage('signin')
+  }
+
+  // Navigation helpers
+  const navigateToSignIn = () => setPage('signin')
+  const navigateToSignUp = () => setPage('signup')
+
+  // Show a loading screen while we check the token
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: '#0f172a',
+        color: '#f8fafc',
+        fontFamily: 'sans-serif',
+      }}>
+        <h2>Loading...</h2>
+      </div>
+    )
+  }
+
+  // Render the correct page based on state
+  if (page === 'home') {
+    return <Home user={user} onLogout={handleLogout} />
+  }
+
+  if (page === 'signin') {
+    return <SignIn onNavigateToSignUp={navigateToSignUp} onSignInSuccess={handleSignInSuccess} />
+  }
+
+  return <SignUp onNavigateToSignIn={navigateToSignIn} />
 }
 
 export default App
