@@ -2,19 +2,8 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import SignUp from './signUp and SignIn/SignUp'
 import SignIn from './signUp and SignIn/SignIn'
-import Home from './Home'
+import Home from './Home/Home'
 
-/**
- * App — the root component that controls which page the user sees.
- *
- * Page routing works like this:
- *   - 'signup'  → show the registration form
- *   - 'signin'  → show the login form
- *   - 'home'    → show the protected dashboard (requires a valid token)
- *
- * On startup, we check if the user already has a valid token saved.
- * If yes, we skip the login screen and go straight to the dashboard.
- */
 function App() {
   const [page, setPage] = useState('signin')
   const [user, setUser] = useState(null)
@@ -93,9 +82,9 @@ function App() {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
-        backgroundColor: '#0f172a',
-        color: '#f8fafc',
-        fontFamily: 'sans-serif',
+        backgroundColor: '#f8fafc',
+        color: '#0f172a',
+        fontFamily: "'Outfit', sans-serif",
       }}>
         <h2>Loading...</h2>
       </div>
