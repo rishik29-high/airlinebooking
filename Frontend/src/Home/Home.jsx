@@ -383,7 +383,7 @@ function Home({ user, onLogout }) {
                     <div className="time-node">
                       <span className="time">
                         {flight.departureTime
-                          ? new Date(`2000-01-01T${flight.departureTime.includes('T') ? flight.departureTime.split('T')[1] : flight.departureTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                          ? new Date(flight.departureTime.replace(' ', 'T')).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
                           : flight.departureTime}
                       </span>
                       <span className="airport">{flight.departureCode}</span>
@@ -404,7 +404,7 @@ function Home({ user, onLogout }) {
                     <div className="time-node">
                       <span className="time">
                         {flight.arrivalTime
-                          ? new Date(`2000-01-01T${flight.arrivalTime.includes('T') ? flight.arrivalTime.split('T')[1] : flight.arrivalTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                          ? new Date(flight.arrivalTime.replace(' ', 'T')).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
                           : flight.arrivalTime}
                       </span>
                       <span className="airport">{flight.arrivalCode}</span>
