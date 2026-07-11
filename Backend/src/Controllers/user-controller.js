@@ -4,10 +4,6 @@ import jwt from 'jsonwebtoken'
 const JWT_KEY = 'secret'
 const userService = new UserService()
 
-/**
- * POST /api/signup
- * Creates a new user account.
- */
 const signUp = async (req, res) => {
   try {
     const user = await userService.signUp({
@@ -33,15 +29,10 @@ const signUp = async (req, res) => {
   }
 }
 
-/**
- * POST /api/signin
- * Authenticates a user and returns a JWT token.
- */
 const signIn = async (req, res) => {
   try {
     const user = await userService.signIn(req.body.email, req.body.password)
 
-    // Generate a JWT token that expires in 1 day
     const token = jwt.sign(
       { id: user._id, email: user.email, fullname: user.fullname },
       JWT_KEY,

@@ -1,11 +1,7 @@
 import { Schema, model } from 'mongoose'
 import bcrypt from 'bcrypt'
 
-/**
- * User Schema — defines the shape of a user document in MongoDB.
- * Fields: fullname, email (unique), password
- * Timestamps: createdAt and updatedAt are added automatically
- */
+
 const userSchema = new Schema(
   {
     fullname: {
@@ -26,11 +22,10 @@ const userSchema = new Schema(
 )
 
 /**
- * Pre-save hook — runs automatically BEFORE saving a user to the database.
- * It hashes the password so we never store plain-text passwords.
  * The "isModified" check ensures we only hash when the password actually changed,
  * not every time we update any field on the user.
  */
+
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return
 
