@@ -4,11 +4,11 @@ import { authMiddleware } from '../Middlewares/auth-middleware.js'
 
 const router = express.Router()
 
-// ──── Public routes (no token needed) ────
+// Public routes (no token needed)
 router.post('/signup', signUp)
 router.post('/signin', signIn)
 
-// ──── Protected routes (token required) ────
+// Protected routes (token required) 
 router.get('/home', authMiddleware, (req, res) => {
   return res.status(200).json({
     success: true,

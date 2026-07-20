@@ -11,7 +11,6 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('/api', userRoute)
 
-// Wait for MongoDB to connect before accepting requests
 const startServer = async () => {
   await connectToMongoDB('mongodb://localhost:27017/airline-booking')
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`))

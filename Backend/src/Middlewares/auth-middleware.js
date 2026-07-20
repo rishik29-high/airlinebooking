@@ -26,7 +26,7 @@ const authMiddleware = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, JWT_KEY)
     req.user = decoded  // Attach user info (id, email, fullname) to the request
-    next()              // Move on to the actual route handler
+    next()              
   } catch (error) {
     return res.status(401).json({
       success: false,
